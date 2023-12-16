@@ -60,7 +60,7 @@ impl Game {
     }
 
     fn clear_screen(&self) {
-        print!("{esc}[2J{esc}[1;1H", esc = 27 as char);
+        print!("\x1B[2J\x1B[1;1H");
     }
 
     fn print_prompt(&self) {
@@ -108,6 +108,7 @@ impl Game {
                 Err(_) => {
                     println!("Please enter a valid number");
                     sleep(std::time::Duration::from_secs(3));
+                    user_input.clear();
                     continue;
                 }
             };
@@ -115,12 +116,14 @@ impl Game {
             if cell < 1 || cell > 9 {
                 println!("Please enter a number between 1 and 9");
                 sleep(std::time::Duration::from_secs(3));
+                user_input.clear();
                 continue;
             }
 
             if self.x_list.contains(&cell) || self.o_list.contains(&cell) {
                 println!("That cell is already taken");
                 sleep(std::time::Duration::from_secs(3));
+                user_input.clear();
                 continue;
             }
 
