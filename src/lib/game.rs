@@ -1,5 +1,6 @@
 use crate::lib::state::State;
 use std::io;
+use colored::Colorize;
 
 pub struct Game {
     pub x_list: Vec<i8>,
@@ -68,14 +69,16 @@ impl Game {
 
 
     fn print_board(&self) {
+        let x_color = "X".blue().bold();
+        let o_color = "O".magenta().bold();
         self.clear_screen();
         for i in 0..3 {
             for j in 0..3 {
                 let current_cell = i * 3 + j + 1;
                 if self.x_list.contains(&(current_cell)) {
-                    print!(" X ");
+                    print!(" {} ", x_color);
                 } else if self.o_list.contains(&(current_cell)) {
-                    print!(" O ");
+                    print!(" {} ", o_color);
                 } else {
                     print!(" {} ", current_cell);
                 }
@@ -145,6 +148,6 @@ impl Game {
                 },
             }
         }
-        return State::EndGame
+        State::EndGame
     }
 }

@@ -1,7 +1,7 @@
+mod lib;
+
 use crate::lib::state::State;
 use crate::lib::game::Game;
-
-mod lib;
 
 use std::io;
 
@@ -32,7 +32,6 @@ fn main() {
             }
             State::EndGame => {
                 println!("Game over!");
-                break;
             }
             State::Play => {
                 let mut game = Game::new();
