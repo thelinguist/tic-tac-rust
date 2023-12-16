@@ -3,6 +3,7 @@ use std::io;
 use std::thread::sleep;
 use std::time::Duration;
 use crate::lib::board::Board;
+use crate::lib::chips::{o_chip, x_chip};
 use crate::lib::constants::QUIT;
 use crate::lib::game_result::GameResult;
 
@@ -20,7 +21,7 @@ impl Game {
     }
 
     fn print_prompt(&self) {
-        let turn = if self.x_turn { "X" } else { "O" };
+        let turn = if self.x_turn { x_chip() } else { o_chip() };
         println!("{turn}: Enter a number between 1 and 9 to place your mark (or {QUIT} to quit)");
     }
 
@@ -36,7 +37,7 @@ impl Game {
             let cell: i8 = match user_input.trim().parse() {
                 Ok(num) => num,
                 Err(_) => {
-                    if (user_input.trim() == QUIT) {
+                    if user_input.trim() == QUIT {
                         println!("Goodbye!");
                         return State::EndGame
                     }
@@ -58,11 +59,13 @@ impl Game {
             self.board.print_board();
             match result {
                 GameResult::XWon => {
-                    println!("X won!");
+                    let chip = x_chip();
+                    println!("{chip} won!");
                     return State::EndGame
                 },
                 GameResult::OWon => {
-                    println!("O won!");
+                    let chip = o_chip();
+                    println!("{chip} won!");
                     return State::EndGame
                 },
                 GameResult::Tie => {

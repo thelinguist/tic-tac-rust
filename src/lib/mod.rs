@@ -4,3 +4,4 @@ pub mod game;
 mod board;
 mod game_result;
 pub mod constants;
+mod chips;

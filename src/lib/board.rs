@@ -1,6 +1,6 @@
 use std::thread::sleep;
 use std::time::Duration;
-use colored::Colorize;
+use crate::lib::chips::{o_chip, x_chip};
 use crate::lib::game_result::GameResult;
 
 pub struct Board {
@@ -83,16 +83,14 @@ impl Board {
     }
 
     pub fn print_board(&self) {
-        let x_color = "X".blue().bold();
-        let o_color = "O".magenta().bold();
         self.clear_screen();
         for i in 0..3 {
             for j in 0..3 {
                 let current_cell = i * 3 + j + 1;
                 if self.x_list.contains(&(current_cell)) {
-                    print!(" {} ", x_color);
+                    print!(" {} ", x_chip());
                 } else if self.o_list.contains(&(current_cell)) {
-                    print!(" {} ", o_color);
+                    print!(" {} ", o_chip());
                 } else {
                     print!(" {} ", current_cell);
                 }
