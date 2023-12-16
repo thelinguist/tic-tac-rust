@@ -2,70 +2,20 @@ use crate::lib::state::State;
 use std::io;
 use std::thread::sleep;
 use std::time::Duration;
-use colored::Colorize;
+use crate::lib::board::Board;
+use crate::lib::game_result::GameResult;
 
 pub struct Game {
-    pub x_list: [i8; 9],
-    pub o_list: [i8; 9],
+    pub board: Board,
     pub x_turn: bool,
-}
-
-enum GameResult {
-    XWon,
-    OWon,
-    Tie,
-    InProgress,
 }
 
 impl Game {
     pub fn new() -> Game {
         Game {
-            x_list: [-1; 9], // -1 is a placeholder for empty cells
-            o_list: [-1; 9],
+            board: Board::new(),
             x_turn: true,
         }
-    }
-    pub fn check_winner(&self) -> GameResult {
-        let winning_combinations: [[i8; 3]; 8] = [
-            [1, 2, 3],
-            [4, 5, 6],
-            [7, 8, 9],
-            [1, 4, 7],
-            [2, 5, 8],
-            [3, 6, 9],
-            [1, 5, 9],
-            [3, 5, 7],
-        ];
-        for combination in winning_combinations {
-            let mut x_count = 0;
-            let mut o_count = 0;
-            for cell in combination {
-                if self.x_list.contains(&cell) {
-                    x_count += 1;
-                }
-                if self.o_list.contains(&cell) {
-                    o_count += 1;
-                }
-            }
-            if x_count == 3 {
-                return GameResult::XWon
-            }
-            if o_count == 3 {
-                return GameResult::OWon
-            }
-        }
-        // check for a tie
-        let x_count = self.x_list.iter().filter(|&x| *x != -1).count();
-        let y_count = self.o_list.iter().filter(|&x| *x != -1).count();
-        if x_count + y_count == 9 {
-            return GameResult::Tie
-        }
-
-        GameResult::InProgress
-    }
-
-    fn clear_screen(&self) {
-        print!("\x1B[2J\x1B[1;1H");
     }
 
     fn print_prompt(&self) {
@@ -73,37 +23,11 @@ impl Game {
         println!("{turn}: Enter a number between 1 and 9 to place your mark (or q to quit)");
     }
 
-
-    fn print_board(&self) {
-        let x_color = "X".blue().bold();
-        let o_color = "O".magenta().bold();
-        self.clear_screen();
-        for i in 0..3 {
-            for j in 0..3 {
-                let current_cell = i * 3 + j + 1;
-                if self.x_list.contains(&(current_cell)) {
-                    print!(" {} ", x_color);
-                } else if self.o_list.contains(&(current_cell)) {
-                    print!(" {} ", o_color);
-                } else {
-                    print!(" {} ", current_cell);
-                }
-                if j < 2 {
-                    print!("|");
-                }
-            }
-            print!("\n");
-            if i < 2 {
-                println!("---------")
-            }
-        }
-    }
-
     pub fn play(&mut self) -> State {
         let mut user_input = String::new();
 
         while user_input.trim() != "q" {
-            self.print_board();
+            self.board.print_board();
             self.print_prompt();
             io::stdin()
                 .read_line(&mut user_input).expect("Failed to read line");
@@ -117,33 +41,16 @@ impl Game {
                     continue;
                 }
             };
-
-            if cell < 1 || cell > 9 {
-                println!("Please enter a number between 1 and 9");
-                sleep(Duration::from_secs(3));
+            let is_valid = self.board.add_token(cell, self.x_turn);
+            if !is_valid {
                 user_input.clear();
                 continue;
-            }
-
-            if self.x_list.contains(&cell) || self.o_list.contains(&cell) {
-                println!("That cell is already taken");
-                sleep(Duration::from_secs(3));
-                user_input.clear();
-                continue;
-            }
-
-            if self.x_turn {
-                let place = cell - 1;
-                self.x_list[place as usize] = cell;
-            } else {
-                let place = cell - 1;
-                self.o_list[place as usize] = cell;
             }
             self.x_turn = !self.x_turn;
 
-            let result = self.check_winner();
+            let result = self.board.check_winner();
 
-            self.print_board();
+            self.board.print_board();
             match result {
                 GameResult::XWon => {
                     println!("X won!");
