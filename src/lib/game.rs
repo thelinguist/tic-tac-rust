@@ -3,6 +3,7 @@ use std::io;
 use std::thread::sleep;
 use std::time::Duration;
 use crate::lib::board::Board;
+use crate::lib::constants::QUIT;
 use crate::lib::game_result::GameResult;
 
 pub struct Game {
@@ -20,13 +21,13 @@ impl Game {
 
     fn print_prompt(&self) {
         let turn = if self.x_turn { "X" } else { "O" };
-        println!("{turn}: Enter a number between 1 and 9 to place your mark (or q to quit)");
+        println!("{turn}: Enter a number between 1 and 9 to place your mark (or {QUIT} to quit)");
     }
 
     pub fn play(&mut self) -> State {
         let mut user_input = String::new();
 
-        while user_input.trim() != "q" {
+        while user_input.trim() != QUIT {
             self.board.print_board();
             self.print_prompt();
             io::stdin()
@@ -35,6 +36,10 @@ impl Game {
             let cell: i8 = match user_input.trim().parse() {
                 Ok(num) => num,
                 Err(_) => {
+                    if (user_input.trim() == QUIT) {
+                        println!("Goodbye!");
+                        return State::EndGame
+                    }
                     println!("Please enter a valid number");
                     sleep(Duration::from_secs(3));
                     user_input.clear();
