@@ -4,8 +4,8 @@ use std::thread::sleep;
 use colored::Colorize;
 
 pub struct Game {
-    pub x_list: Vec<i8>,
-    pub o_list: Vec<i8>,
+    pub x_list: [i8; 9],
+    pub o_list: [i8; 9],
     pub x_turn: bool,
 }
 
@@ -19,8 +19,8 @@ enum GameResult {
 impl Game {
     pub fn new() -> Game {
         Game {
-            x_list: Vec::new(),
-            o_list: Vec::new(),
+            x_list: [-1; 9], // -1 is a placeholder for empty cells
+            o_list: [-1; 9],
             x_turn: true,
         }
     }
@@ -53,7 +53,7 @@ impl Game {
                 return GameResult::OWon
             }
         }
-        if (self.x_list.len() + self.o_list.len()) == 9 {
+        if !self.x_list.contains(&-1) && !self.o_list.contains(&-1) {
             return GameResult::Tie
         }
         GameResult::InProgress
@@ -128,9 +128,11 @@ impl Game {
             }
 
             if self.x_turn {
-                self.x_list.push(cell);
+                let place = cell - 1;
+                self.x_list[place as usize] = cell;
             } else {
-                self.o_list.push(cell);
+                let place = cell - 1;
+                self.o_list[place as usize] = cell;
             }
             self.x_turn = !self.x_turn;
 
