@@ -1,6 +1,7 @@
 use crate::lib::state::State;
 use std::io;
 use std::thread::sleep;
+use std::time::Duration;
 use colored::Colorize;
 
 pub struct Game {
@@ -25,15 +26,15 @@ impl Game {
         }
     }
     pub fn check_winner(&self) -> GameResult {
-        let winning_combinations: Vec<Vec<i8>> = vec![
-            vec![1, 2, 3],
-            vec![4, 5, 6],
-            vec![7, 8, 9],
-            vec![1, 4, 7],
-            vec![2, 5, 8],
-            vec![3, 6, 9],
-            vec![1, 5, 9],
-            vec![3, 5, 7],
+        let winning_combinations: [[i8; 3]; 8] = [
+            [1, 2, 3],
+            [4, 5, 6],
+            [7, 8, 9],
+            [1, 4, 7],
+            [2, 5, 8],
+            [3, 6, 9],
+            [1, 5, 9],
+            [3, 5, 7],
         ];
         for combination in winning_combinations {
             let mut x_count = 0;
@@ -53,9 +54,13 @@ impl Game {
                 return GameResult::OWon
             }
         }
-        if !self.x_list.contains(&-1) && !self.o_list.contains(&-1) {
+        // check for a tie
+        let x_count = self.x_list.iter().filter(|&x| *x != -1).count();
+        let y_count = self.o_list.iter().filter(|&x| *x != -1).count();
+        if x_count + y_count == 9 {
             return GameResult::Tie
         }
+
         GameResult::InProgress
     }
 
@@ -107,7 +112,7 @@ impl Game {
                 Ok(num) => num,
                 Err(_) => {
                     println!("Please enter a valid number");
-                    sleep(std::time::Duration::from_secs(3));
+                    sleep(Duration::from_secs(3));
                     user_input.clear();
                     continue;
                 }
@@ -115,14 +120,14 @@ impl Game {
 
             if cell < 1 || cell > 9 {
                 println!("Please enter a number between 1 and 9");
-                sleep(std::time::Duration::from_secs(3));
+                sleep(Duration::from_secs(3));
                 user_input.clear();
                 continue;
             }
 
             if self.x_list.contains(&cell) || self.o_list.contains(&cell) {
                 println!("That cell is already taken");
-                sleep(std::time::Duration::from_secs(3));
+                sleep(Duration::from_secs(3));
                 user_input.clear();
                 continue;
             }
