@@ -1,5 +1,6 @@
 use crate::lib::state::State;
 use std::io;
+use std::thread::sleep;
 use colored::Colorize;
 
 pub struct Game {
@@ -106,18 +107,21 @@ impl Game {
                 Ok(num) => num,
                 Err(_) => {
                     println!("Please enter a valid number");
-                    break;
+                    sleep(std::time::Duration::from_secs(3));
+                    continue;
                 }
             };
 
             if cell < 1 || cell > 9 {
                 println!("Please enter a number between 1 and 9");
-                break;
+                sleep(std::time::Duration::from_secs(3));
+                continue;
             }
 
             if self.x_list.contains(&cell) || self.o_list.contains(&cell) {
                 println!("That cell is already taken");
-                break;
+                sleep(std::time::Duration::from_secs(3));
+                continue;
             }
 
             if self.x_turn {
